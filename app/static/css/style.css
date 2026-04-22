@@ -1,0 +1,11 @@
+body {
+    background: #f5f7fb;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+table {
+    font-size: 0.93rem;
+}

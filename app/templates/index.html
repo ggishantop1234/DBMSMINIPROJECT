@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header">Add Alumni</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_alumni') }}">
+                    <div class="mb-2">
+                        <label class="form-label">Full Name</label>
+                        <input class="form-control" type="text" name="full_name" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" type="email" name="email" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Phone</label>
+                        <input class="form-control" type="text" name="phone" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" name="department_id" required>
+                            {% for d in departments %}
+                                <option value="{{ d.department_id }}">{{ d.department_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Graduation Year</label>
+                        <input class="form-control" type="number" name="graduation_year" min="1990" max="2099" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Current Company</label>
+                        <input class="form-control" type="text" name="current_company" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current Role</label>
+                        <input class="form-control" type="text" name="current_role" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Add Alumni</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">Create Event</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_event') }}">
+                    <div class="mb-2"><input class="form-control" type="text" name="event_name" placeholder="Event Name" required></div>
+                    <div class="mb-2"><input class="form-control" type="date" name="event_date" required></div>
+                    <div class="mb-2"><input class="form-control" type="text" name="venue" placeholder="Venue" required></div>
+                    <div class="mb-3"><textarea class="form-control" name="description" placeholder="Description" rows="2" required></textarea></div>
+                    <button class="btn btn-success" type="submit">Add Event</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">Register Alumni to Event</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_registration') }}">
+                    <div class="mb-2">
+                        <label class="form-label">Alumni</label>
+                        <select class="form-select" name="alumni_id" required>
+                            {% for a in alumni %}
+                                <option value="{{ a.alumni_id }}">{{ a.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Event</label>
+                        <select class="form-select" name="event_id" required>
+                            {% for e in events %}
+                                <option value="{{ e.event_id }}">{{ e.event_name }} ({{ e.event_date }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="attended" value="1" id="attended">
+                        <label class="form-check-label" for="attended">Mark as attended</label>
+                    </div>
+                    <button class="btn btn-warning" type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header">Alumni List</div>
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Year</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in alumni %}
+                <tr>
+                    <td>{{ a.alumni_id }}</td>
+                    <td>{{ a.full_name }}</td>
+                    <td>{{ a.email }}</td>
+                    <td>{{ a.department_name }}</td>
+                    <td>{{ a.graduation_year }}</td>
+                    <td>{{ a.current_company }}</td>
+                    <td>{{ a.current_role }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_alumni', alumni_id=a.alumni_id) }}" onsubmit="return confirm('Delete this alumni?');">
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header">Events + Registrations Report</div>
+    <div class="table-responsive">
+        <table class="table table-bordered mb-0">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Total Registrations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in events %}
+                <tr>
+                    <td>{{ e.event_name }}</td>
+                    <td>{{ e.event_date }}</td>
+                    <td>{{ e.venue }}</td>
+                    <td>{{ e.registrations_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header">Registration History</div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Alumni</th>
+                    <th>Event</th>
+                    <th>Registered At</th>
+                    <th>Attended</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in registrations %}
+                <tr>
+                    <td>{{ r.registration_id }}</td>
+                    <td>{{ r.full_name }}</td>
+                    <td>{{ r.event_name }}</td>
+                    <td>{{ r.registered_at }}</td>
+                    <td>{{ 'Yes' if r.attended else 'No' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
